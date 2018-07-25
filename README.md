@@ -5,7 +5,9 @@ A GUI Scientific Calculator With JAVA
 
 build with javac 1.8.0
 
-compile with ###### javac mainframe.java
+compile with 
+###### javac mainframe.java
 
-run with ###### java Mainframe
+run with 
+###### java Mainframe
 
