@@ -224,7 +224,7 @@ public class Expression {
 
 		
 
-		// for (L)ogarithm...
+		// for (L)ogarithm base e...
 
 		for(int i=0; i<expr.length(); i++) {
 			if(expr.charAt(i)== 'L') {
@@ -233,6 +233,21 @@ public class Expression {
 					throw new NumberFormatException();
 				double sub_res_l= Math.log(Double.parseDouble(sub_expr_l));
 				sub_expr_l= 'L'+ sub_expr_l;
+				expr= expr.replaceFirst(Pattern.quote(sub_expr_l), sub_res_l+"");
+				expr= this.remove_e(expr);
+				i= -1;
+			}
+		}
+
+		// for (l)ogarithm base 10...
+
+		for(int i=0; i<expr.length(); i++) {
+			if(expr.charAt(i)== 'l') {
+				String sub_expr_l= this.get_val_from(expr, i+1);
+				if(sub_expr_l.length()<1)
+					throw new NumberFormatException();
+				double sub_res_l= Math.log(Double.parseDouble(sub_expr_l))/Math.log(10.0);
+				sub_expr_l= 'l'+ sub_expr_l;
 				expr= expr.replaceFirst(Pattern.quote(sub_expr_l), sub_res_l+"");
 				expr= this.remove_e(expr);
 				i= -1;
@@ -788,8 +803,64 @@ public class Expression {
 		expr= expr.replace("Tan", "t");
 	
 		expr= expr.replace("ln", "L");
+		expr= expr.replace("log", "l");
 
 		return expr;
+	}
+
+	public double round(double value, int scale) {
+    	return Math.round(value * Math.pow(10, scale)) / Math.pow(10, scale);
+	}
+
+	boolean isGood() {
+		String exp= Expression;
+		String numbers= "0123456789.";
+		String operators= "+-*/^";
+		String trig= "SCTsctLl";
+		boolean strongSearch= true;
+
+		int stackPos= 0;
+
+		for(int i=0; i<exp.length(); i++) {
+			if(exp.charAt(i) == '(') {
+				stackPos++;
+			}
+			else if(exp.charAt(i) == ')') {
+				if(stackPos>0) {
+					stackPos--;
+				}
+				else {
+					return false;
+				}
+			}
+			else {
+				if(strongSearch && i<exp.length()-1) {
+					if(isin(exp.charAt(i), operators)) {
+						if(isin(exp.charAt(i+1), operators)) {
+							return false;
+						}
+					}
+					else if(isin(exp.charAt(i), trig)) {
+						if(isin(exp.charAt(i+1), trig)) {
+							return false;
+						}
+					}
+				}
+			}
+		}
+		if(stackPos == 0) {
+			return true;
+		}
+		return false;
+	}
+
+	private boolean isin(char c, String str) {
+		for(int i=0; i<str.length(); i++) {
+			if(c == str.charAt(i)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
